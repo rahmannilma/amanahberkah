@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Row, Col, Typography, Input, Select, Button, Modal, Tag, Table, Form, InputNumber, Space, message, theme, Upload } from 'antd';
+import { Card, Row, Col, Typography, Input, Select, Button, Modal, Tag, Table, Form, InputNumber, Space, message, theme, Upload, List } from 'antd';
 import { PlusOutlined, SearchOutlined, PoweroffOutlined, UploadOutlined } from '@ant-design/icons';
 
 // Utility helper to convert file to high-performance compressed Base64 string
@@ -546,16 +546,110 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
             </div>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <Table
+          {isMobile ? (
+            <List
               dataSource={filteredVehicles}
-              columns={columns}
               rowKey="id"
-              pagination={{ pageSize: 5 }}
-              style={{ background: 'transparent' }}
-              className="premium-table"
+              pagination={{
+                pageSize: 5,
+                size: 'small',
+                style: { textAlign: 'center', marginTop: '24px' }
+              }}
+              renderItem={(item) => (
+                <div 
+                  key={item.id} 
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.02)', 
+                    border: '1px solid rgba(255, 255, 255, 0.05)', 
+                    borderRadius: '12px', 
+                    padding: '16px', 
+                    marginBottom: '16px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'start', marginBottom: '16px' }}>
+                    <img 
+                      src={item.images && item.images[0] ? item.images[0] : '/image/car_civic.png'} 
+                      alt={item.name} 
+                      style={{ 
+                        width: '80px', 
+                        height: '60px', 
+                        objectFit: 'cover', 
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)'
+                      }} 
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: '8px' }}>
+                        <Text strong style={{ color: '#ffffff', fontSize: '15px', display: 'block', lineHeight: '1.2' }}>{item.name}</Text>
+                        <Tag color={item.status === 'Tersedia' ? 'green' : 'volcano'} style={{ fontWeight: 'bold', margin: 0, fontSize: '11px' }}>
+                          {item.status.toUpperCase()}
+                        </Tag>
+                      </div>
+                      <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '2px' }}>
+                        {item.brand} • {item.year} • {item.type}
+                      </Text>
+                      <Text strong style={{ color: '#ff562d', fontSize: '15px', display: 'block', marginTop: '6px' }}>
+                        {formatRupiah(item.price)}
+                      </Text>
+                      {item.status === 'Laku' && (item.solddate || item.soldDate) && (
+                        <Text style={{ fontSize: '11px', color: '#ac8980', display: 'block', marginTop: '4px' }}>
+                          Laku: {item.solddate || item.soldDate}
+                        </Text>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Action Buttons for Mobile */}
+                  <div style={{ display: 'flex', gap: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '12px' }}>
+                    <Button 
+                      type={item.status === 'Tersedia' ? 'primary' : 'default'}
+                      size="middle"
+                      onClick={() => handleToggleStatus(item.id)}
+                      style={{ 
+                        flex: 1,
+                        background: item.status === 'Tersedia' ? 'linear-gradient(to right, #ff562d, #ff8a00)' : 'transparent',
+                        border: item.status === 'Tersedia' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
+                        color: '#ffffff',
+                        fontWeight: 'bold',
+                        borderRadius: '8px',
+                        fontSize: '13px'
+                      }}
+                    >
+                      {item.status === 'Tersedia' ? 'Tandai Laku' : 'Tersedia Kembali'}
+                    </Button>
+                    <Button 
+                      type="text" 
+                      danger 
+                      onClick={() => handleDeleteVehicle(item.id)}
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        border: '1px solid rgba(255, 77, 79, 0.2)',
+                        borderRadius: '8px',
+                        padding: '0 12px',
+                        background: 'rgba(255, 77, 79, 0.05)'
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>delete</span>
+                    </Button>
+                  </div>
+                </div>
+              )}
             />
-          </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <Table
+                dataSource={filteredVehicles}
+                columns={columns}
+                rowKey="id"
+                pagination={{ pageSize: 5 }}
+                style={{ background: 'transparent' }}
+                className="premium-table"
+              />
+            </div>
+          )}
         </Card>
       </div>
 
