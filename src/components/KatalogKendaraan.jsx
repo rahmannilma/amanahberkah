@@ -538,7 +538,7 @@ Simulasi Kredit Pilihan Saya:
 - Estimasi cicilan: ${formatRupiah(creditDetails.monthlyInstallment)}/bulan.
 Mohon info selanjutnya, terima kasih!`;
                       
-                      const waUrl = `https://wa.me/628123456789?text=${encodeURIComponent(messageText)}`;
+                      const waUrl = `https://wa.me/6282393700500?text=${encodeURIComponent(messageText)}`;
                       window.open(waUrl, '_blank');
                     }}
                     style={{ fontWeight: 'bold' }}

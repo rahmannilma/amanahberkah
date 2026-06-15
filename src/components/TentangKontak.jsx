@@ -110,7 +110,7 @@ export default function TentangKontak() {
                   <PhoneOutlined style={{ color: token.colorPrimary, fontSize: '16px', marginTop: '4px' }} />
                   <div>
                     <Text strong style={{ display: 'block' }}>WhatsApp Admin Marketing</Text>
-                    <Text type="secondary" style={{ fontSize: '13px' }}>+62 812-3548-8067</Text>
+                    <Text type="secondary" style={{ fontSize: '13px' }}>+62 823-9370-0500</Text>
                   </div>
                 </div>
 
@@ -141,7 +141,7 @@ export default function TentangKontak() {
             {/* Google Maps Card */}
             <Card
               bordered={false}
-              bodyStyle={{ padding: 0 }}
+              styles={{ body: { padding: 0 } }}
               style={{
                 background: token.colorBgContainer,
                 borderRadius: '16px',
@@ -152,12 +152,13 @@ export default function TentangKontak() {
             >
               <iframe
                 title="Peta Lokasi AMANAH BERKAH"
-                src="https://www.google.com/maps?q=-2.6904774,118.8803951&z=15&output=embed"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3985.4203048759114!2d118.88039509999999!3d-2.6904774!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2d92d9003a1b051f%3A0x2abec7cee07daba9!2sShow%20room%20Amanah%20Berkah!5e0!3m2!1sid!2sid!4v1781537302435!5m2!1sid!2sid"
                 width="100%"
                 height="230"
                 style={{ border: 0, display: 'block' }}
                 allowFullScreen=""
                 loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
             </Card>
           </Space>

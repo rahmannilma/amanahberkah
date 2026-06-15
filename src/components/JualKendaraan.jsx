@@ -46,7 +46,7 @@ Saya ingin menjual kendaraan saya dengan rincian berikut:
 Mohon informasi estimasi harga dan kelayakan untuk unit saya. Terima kasih!`;
 
     // WhatsApp URL (using official K-Cunk Motor number or customizable)
-    const adminNumber = '6281235488067';
+    const adminNumber = '6282393700500';
     const waUrl = `https://wa.me/${adminNumber}?text=${encodeURIComponent(textMessage)}`;
     
     window.open(waUrl, '_blank');
@@ -99,7 +99,7 @@ Mohon informasi estimasi harga dan kelayakan untuk unit saya. Terima kasih!`;
                 { min: 10, message: 'Minimal 10 digit!' }
               ]}
             >
-              <Input placeholder="Contoh: 628123456789" prefix={<PhoneOutlined style={{ color: token.colorTextDescription }} />} />
+              <Input placeholder="Contoh: 6282393700500" prefix={<PhoneOutlined style={{ color: token.colorTextDescription }} />} />
             </Form.Item>
 
             <Form.Item
