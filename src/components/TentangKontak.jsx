@@ -14,6 +14,16 @@ const { Title, Paragraph, Text } = Typography;
 export default function TentangKontak() {
   const { token } = theme.useToken();
 
+  const [isMobile, setIsMobile] = React.useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const galleryImages = [
     '/image/gallery1.png',
     '/image/gallery2.png',
@@ -22,13 +32,13 @@ export default function TentangKontak() {
   ];
 
   return (
-    <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto', minHeight: '100vh' }}>
+    <div style={{ padding: isMobile ? '24px 12px' : '40px 24px', maxWidth: '1200px', margin: '0 auto', minHeight: '100vh' }}>
       {/* Title Header */}
-      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-        <Title level={2} style={{ margin: 0, fontWeight: 800, color: token.colorPrimary }}>
+      <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '50px' }}>
+        <Title level={isMobile ? 3 : 2} style={{ margin: 0, fontWeight: 800, color: token.colorPrimary }}>
           Profil Showroom AMANAH BERKAH
         </Title>
-        <Paragraph style={{ color: token.colorTextSecondary, marginTop: '8px', fontSize: '15px' }}>
+        <Paragraph style={{ color: token.colorTextSecondary, marginTop: '8px', fontSize: isMobile ? '13px' : '15px' }}>
           Showroom Mobil & Motor Bekas Terpercaya dari Mamuju, Sulawesi Barat.
         </Paragraph>
       </div>
@@ -156,7 +166,7 @@ export default function TentangKontak() {
 
       {/* Gallery Section */}
       <div style={{ marginTop: '50px' }}>
-        <Title level={3} style={{ marginBottom: '24px', color: token.colorPrimary, fontWeight: 'bold' }}>Galeri Showroom & Unit</Title>
+        <Title level={isMobile ? 4 : 3} style={{ marginBottom: '24px', color: token.colorPrimary, fontWeight: 'bold' }}>Galeri Showroom & Unit</Title>
         <Row gutter={[16, 16]}>
           {galleryImages.map((imgUrl, index) => (
             <Col xs={12} md={6} key={index}>
@@ -165,7 +175,7 @@ export default function TentangKontak() {
                   src={imgUrl}
                   alt={`Galeri Unit K-Cunk ${index + 1}`}
                   width="100%"
-                  height={160}
+                  height={isMobile ? 120 : 160}
                   style={{ objectFit: 'cover' }}
                 />
               </div>

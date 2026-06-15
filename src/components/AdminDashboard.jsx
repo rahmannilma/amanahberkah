@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, Row, Col, Typography, Input, Select, Button, Modal, Tag, Table, Form, InputNumber, Space, message, theme } from 'antd';
 import { PlusOutlined, SearchOutlined, PoweroffOutlined } from '@ant-design/icons';
 
@@ -12,6 +12,17 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+
   // Get current date context
   const now = new Date();
   const currentYear = now.getFullYear().toString();
@@ -22,14 +33,14 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
   // 1. ANALYTICS CALCULATIONS
   const stats = useMemo(() => {
     // Filter out sold vehicles
-    const soldVehicles = vehicles.filter((v) => v.status === 'Laku' && v.soldDate);
+    const soldVehicles = vehicles.filter((v) => v.status === 'Laku' && (v.solddate || v.soldDate));
 
     // This Month Sales
-    const soldThisMonth = soldVehicles.filter((v) => v.soldDate.startsWith(currentYearMonth));
+    const soldThisMonth = soldVehicles.filter((v) => (v.solddate || v.soldDate).startsWith(currentYearMonth));
     const totalRevenueThisMonth = soldThisMonth.reduce((sum, v) => sum + v.price, 0);
 
     // This Year Sales
-    const soldThisYear = soldVehicles.filter((v) => v.soldDate.startsWith(currentYear));
+    const soldThisYear = soldVehicles.filter((v) => (v.solddate || v.soldDate).startsWith(currentYear));
     const totalRevenueThisYear = soldThisYear.reduce((sum, v) => sum + v.price, 0);
 
     return {
@@ -59,11 +70,11 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
     ];
 
     const soldThisYearVehicles = vehicles.filter(
-      (v) => v.status === 'Laku' && v.soldDate && v.soldDate.startsWith(currentYear)
+      (v) => v.status === 'Laku' && (v.solddate || v.soldDate) && (v.solddate || v.soldDate).startsWith(currentYear)
     );
 
     soldThisYearVehicles.forEach((v) => {
-      const monthIndex = parseInt(v.soldDate.split('-')[1], 10) - 1;
+      const monthIndex = parseInt((v.solddate || v.soldDate).split('-')[1], 10) - 1;
       if (monthIndex >= 0 && monthIndex < 12) {
         months[monthIndex].value += v.price;
       }
@@ -117,7 +128,7 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
       transmission: values.transmission,
       year: values.year,
       status: 'Tersedia',
-      soldDate: null,
+      solddate: null,
       images: [
         values.imageUrl || '/image/car_civic.png'
       ],
@@ -193,8 +204,8 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
           <Tag color={status === 'Tersedia' ? 'green' : 'volcano'} style={{ fontWeight: 'bold' }}>
             {status.toUpperCase()}
           </Tag>
-          {status === 'Laku' && record.soldDate && (
-            <Text style={{ fontSize: '11px', color: '#ac8980' }}>Laku: {record.soldDate}</Text>
+          {status === 'Laku' && (record.solddate || record.soldDate) && (
+            <Text style={{ fontSize: '11px', color: '#ac8980' }}>Laku: {record.solddate || record.soldDate}</Text>
           )}
         </Space>
       )
@@ -245,11 +256,19 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
   }
 
   return (
-    <div style={{ background: '#131315', minHeight: '100vh', color: '#e5e1e4', padding: '40px 0' }}>
+    <div style={{ background: '#131315', minHeight: '100vh', color: '#e5e1e4', padding: isMobile ? '20px 0' : '40px 0' }}>
       <div className="premium-container">
         
         {/* Header Dashboard */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: isMobile ? 'flex-start' : 'center', 
+          marginBottom: '40px', 
+          flexWrap: 'wrap', 
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: '16px' 
+        }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ff562d', marginBottom: '8px' }}>
               <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
@@ -257,7 +276,7 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
                 ADMIN CONTROL PANEL
               </span>
             </div>
-            <Title level={2} className="font-montserrat" style={{ margin: 0, color: '#ffffff', fontWeight: 800 }}>
+            <Title level={isMobile ? 3 : 2} className="font-montserrat" style={{ margin: 0, color: '#ffffff', fontWeight: 800 }}>
               Dashboard Penjualan Showroom
             </Title>
           </div>
@@ -267,7 +286,7 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
             danger 
             icon={<PoweroffOutlined />} 
             onClick={onLogout}
-            style={{ borderRadius: '8px', fontWeight: 'bold' }}
+            style={{ borderRadius: '8px', fontWeight: 'bold', width: isMobile ? '100%' : 'auto' }}
           >
             Keluar (Logout)
           </Button>
@@ -277,12 +296,12 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
         <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
           {/* Month Stats */}
           <Col xs={24} md={8}>
-            <div className="bento-card" style={{ padding: '24px' }}>
+            <div className="bento-card" style={{ padding: isMobile ? '16px' : '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <Text style={{ color: '#ac8980', fontSize: '14px', fontWeight: 600 }}>PENJUALAN BULAN INI</Text>
                 <span className="material-symbols-outlined" style={{ color: '#ff562d', fontSize: '24px' }}>calendar_month</span>
               </div>
-              <div className="font-montserrat" style={{ fontSize: '32px', fontWeight: 800, color: '#ffffff', marginBottom: '4px' }}>
+              <div className="font-montserrat" style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: 800, color: '#ffffff', marginBottom: '4px' }}>
                 {formatRupiah(stats.revenueThisMonth)}
               </div>
               <Text type="secondary" style={{ fontSize: '13px' }}>
@@ -293,12 +312,12 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
 
           {/* Year Stats */}
           <Col xs={24} md={8}>
-            <div className="bento-card" style={{ padding: '24px' }}>
+            <div className="bento-card" style={{ padding: isMobile ? '16px' : '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <Text style={{ color: '#ac8980', fontSize: '14px', fontWeight: 600 }}>PENJUALAN TAHUN INI</Text>
                 <span className="material-symbols-outlined" style={{ color: '#ff562d', fontSize: '24px' }}>trending_up</span>
               </div>
-              <div className="font-montserrat" style={{ fontSize: '32px', fontWeight: 800, color: '#ffffff', marginBottom: '4px' }}>
+              <div className="font-montserrat" style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: 800, color: '#ffffff', marginBottom: '4px' }}>
                 {formatRupiah(stats.revenueThisYear)}
               </div>
               <Text type="secondary" style={{ fontSize: '13px' }}>
@@ -309,12 +328,12 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
 
           {/* Total Sold Unit Stats */}
           <Col xs={24} md={8}>
-            <div className="bento-card" style={{ padding: '24px' }}>
+            <div className="bento-card" style={{ padding: isMobile ? '16px' : '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <Text style={{ color: '#ac8980', fontSize: '14px', fontWeight: 600 }}>TOTAL KENDARAAN LAKU</Text>
                 <span className="material-symbols-outlined" style={{ color: '#ff562d', fontSize: '24px' }}>sell</span>
               </div>
-              <div className="font-montserrat" style={{ fontSize: '32px', fontWeight: 800, color: '#ffffff', marginBottom: '4px' }}>
+              <div className="font-montserrat" style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: 800, color: '#ffffff', marginBottom: '4px' }}>
                 {stats.totalSoldUnits} <span style={{ fontSize: '18px', fontWeight: 500, color: '#ac8980' }}>Unit</span>
               </div>
               <Text type="secondary" style={{ fontSize: '13px' }}>
@@ -328,8 +347,8 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
         <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
           {/* Chart Card */}
           <Col xs={24} lg={16}>
-            <div className="bento-card" style={{ padding: '32px', height: '100%' }}>
-              <Title level={4} className="font-montserrat" style={{ color: '#ffffff', margin: '0 0 8px 0', fontSize: '18px', fontWeight: 700 }}>
+            <div className="bento-card" style={{ padding: isMobile ? '16px' : '32px', height: '100%' }}>
+              <Title level={isMobile ? 5 : 4} className="font-montserrat" style={{ color: '#ffffff', margin: '0 0 8px 0', fontWeight: 700 }}>
                 Grafik Omset Penjualan Bulanan ({currentYear})
               </Title>
               <Paragraph style={{ color: '#ac8980', fontSize: '13px', marginBottom: '32px' }}>
@@ -338,13 +357,13 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
 
               {/* SVG Dynamic Bar Chart */}
               <div style={{ display: 'flex', flexDirection: 'column', height: '240px', justifyContent: 'flex-end' }}>
-                <div style={{ display: 'flex', height: '200px', width: '100%', alignItems: 'flex-end', justifyContent: 'space-between', gap: '8px' }}>
+                <div style={{ display: 'flex', height: '200px', width: '100%', alignItems: 'flex-end', justifyContent: 'space-between', gap: isMobile ? '4px' : '8px' }}>
                   {chartData.map((month, idx) => (
                     <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
                       <div 
                         style={{ 
                           width: '100%', 
-                          maxWidth: '28px',
+                          maxWidth: isMobile ? '14px' : '28px',
                           height: `${month.heightPercentage || 2}px`, 
                           background: month.value > 0 ? 'linear-gradient(to top, #ff562d, #ff8a00)' : 'rgba(255, 255, 255, 0.05)',
                           borderRadius: '4px 4px 0 0',
@@ -356,14 +375,14 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
                         {month.value > 0 && (
                           <div style={{ 
                             position: 'absolute', 
-                            top: '-32px', 
+                            top: isMobile ? '-24px' : '-32px', 
                             left: '50%', 
                             transform: 'translateX(-50%)', 
                             background: '#1b1b1d', 
                             border: '1px solid #ff562d',
-                            padding: '2px 6px',
+                            padding: '2px 4px',
                             borderRadius: '4px',
-                            fontSize: '9px',
+                            fontSize: isMobile ? '8px' : '9px',
                             whiteSpace: 'nowrap',
                             color: '#ffffff',
                             fontWeight: 'bold',
@@ -373,7 +392,7 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
                           </div>
                         )}
                       </div>
-                      <span style={{ fontSize: '11px', color: '#ac8980', marginTop: '8px', fontWeight: 600 }}>{month.name}</span>
+                      <span style={{ fontSize: isMobile ? '9px' : '11px', color: '#ac8980', marginTop: '8px', fontWeight: 600 }}>{month.name}</span>
                     </div>
                   ))}
                 </div>
@@ -383,9 +402,9 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
 
           {/* Quick Info card */}
           <Col xs={24} lg={8}>
-            <div className="bento-card" style={{ padding: '32px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="bento-card" style={{ padding: isMobile ? '16px' : '32px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
-                <Title level={4} className="font-montserrat" style={{ color: '#ffffff', margin: '0 0 16px 0', fontSize: '18px', fontWeight: 700 }}>
+                <Title level={isMobile ? 5 : 4} className="font-montserrat" style={{ color: '#ffffff', margin: '0 0 16px 0', fontWeight: 700 }}>
                   Ringkasan Stok Aktif
                 </Title>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -404,7 +423,7 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
                 </div>
               </div>
 
-              <div style={{ background: 'rgba(255, 86, 45, 0.05)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255, 86, 45, 0.1)' }}>
+              <div style={{ background: 'rgba(255, 86, 45, 0.05)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255, 86, 45, 0.1)', marginTop: '20px' }}>
                 <Text style={{ fontSize: '12px', color: '#ac8980', lineHeight: '1.5', display: 'block' }}>
                   📢 <strong>Informasi Admin:</strong> Data penjualan dan status mobil tersinkronisasi otomatis dengan katalog yang dilihat oleh pelanggan di database cloud Supabase.
                 </Text>
@@ -417,18 +436,35 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
         <Card 
           bordered={false} 
           className="bento-card"
+          styles={{ body: { padding: isMobile ? '12px' : '24px' } }}
           style={{ 
             background: 'rgba(27, 27, 29, 0.8)',
             borderRadius: '16px',
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)'
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-            <Title level={4} className="font-montserrat" style={{ color: '#ffffff', margin: 0, fontSize: '18px', fontWeight: 700 }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: isMobile ? 'flex-start' : 'center', 
+            marginBottom: '24px', 
+            flexWrap: 'wrap', 
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: '16px' 
+          }}>
+            <Title level={isMobile ? 5 : 4} className="font-montserrat" style={{ color: '#ffffff', margin: 0, fontWeight: 700 }}>
               Daftar Stok & Inventori
             </Title>
             
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', width: '100%', maxWidth: '500px', justifyContent: 'flex-end' }}>
+            <div style={{ 
+              display: 'flex', 
+              gap: '12px', 
+              flexWrap: 'wrap', 
+              width: '100%', 
+              maxWidth: isMobile ? '100%' : '500px', 
+              justifyContent: isMobile ? 'flex-start' : 'flex-end',
+              flexDirection: isMobile ? 'column' : 'row'
+            }}>
               <Input
                 placeholder="Cari unit atau merek..."
                 prefix={<SearchOutlined style={{ color: '#ac8980' }} />}
@@ -439,7 +475,7 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
                   border: '1px solid rgba(172, 137, 128, 0.2)',
                   color: '#ffffff',
                   borderRadius: '8px',
-                  width: '240px'
+                  width: isMobile ? '100%' : '240px'
                 }}
               />
               <button
@@ -455,7 +491,9 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  color: '#ffffff'
+                  color: '#ffffff',
+                  width: isMobile ? '100%' : 'auto',
+                  justifyContent: 'center'
                 }}
               >
                 <PlusOutlined /> Tambah Unit Baru
@@ -482,9 +520,9 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
         open={isAddModalOpen}
         onCancel={() => { setIsAddModalOpen(false); form.resetFields(); }}
         footer={null}
-        width={650}
-        style={{ top: 50 }}
-        bodyStyle={{ background: '#1b1b1d', color: '#e5e1e4' }}
+        width={isMobile ? '95%' : 650}
+        style={{ top: isMobile ? 10 : 50 }}
+        styles={{ body: { background: '#1b1b1d', color: '#e5e1e4' } }}
       >
         <Form
           form={form}

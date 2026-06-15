@@ -204,6 +204,16 @@ export const DUMMY_VEHICLES = [
 export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
   const { token } = theme.useToken();
 
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [searchText, setSearchText] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [selectedTrans, setSelectedTrans] = useState('All');
@@ -299,12 +309,12 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
   }, [selectedVehicle, dpPercentage, tenor]);
 
   return (
-    <div style={{ padding: '24px', background: 'transparent', minHeight: '100vh' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <Title level={2} style={{ margin: 0, fontWeight: 700, color: token.colorPrimary }}>
+    <div style={{ padding: isMobile ? '16px 12px' : '24px', background: 'transparent', minHeight: '100vh' }}>
+      <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '40px' }}>
+        <Title level={isMobile ? 3 : 2} style={{ margin: 0, fontWeight: 700, color: token.colorPrimary }}>
           Katalog {type} Premium
         </Title>
-        <Paragraph type="secondary">Temukan {type} Impian Anda dengan Penawaran Kredit Terbaik</Paragraph>
+        <Paragraph type="secondary" style={{ fontSize: isMobile ? '13px' : '14px' }}>Temukan {type} Impian Anda dengan Penawaran Kredit Terbaik</Paragraph>
       </div>
 
       <Card style={{ marginBottom: '24px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
@@ -427,16 +437,16 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
         open={isModalOpen}
         onCancel={handleCloseModal}
         footer={null}
-        width={850}
-        style={{ top: 40 }}
+        width={isMobile ? '95%' : 850}
+        style={{ top: isMobile ? 10 : 40 }}
       >
         {selectedVehicle && (
           <Row gutter={[24, 24]} style={{ marginTop: '16px' }}>
             <Col xs={24} md={12}>
               <Carousel autoplay style={{ marginBottom: '20px', borderRadius: '8px', overflow: 'hidden' }}>
                 {selectedVehicle.images.map((img, idx) => (
-                  <div key={idx} style={{ height: '240px' }}>
-                    <img src={img} alt={`img-${idx}`} style={{ width: '100%', height: '240px', objectFit: 'cover' }} />
+                  <div key={idx} style={{ height: isMobile ? '180px' : '240px' }}>
+                    <img src={img} alt={`img-${idx}`} style={{ width: '100%', height: isMobile ? '180px' : '240px', objectFit: 'cover' }} />
                   </div>
                 ))}
               </Carousel>
@@ -483,7 +493,7 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
                     value={tenor}
                     onChange={(val) => setTenor(val)}
                     tooltip={{ formatter: (val) => `${val} Bulan` }}
-                    marks={{
+                    marks={isMobile ? undefined : {
                       12: '1 Thn',
                       24: '2 Thn',
                       36: '3 Thn',
@@ -498,7 +508,7 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
                     <Text type="secondary">Pokok Hutang:</Text>
                     <Text>{formatRupiah(creditDetails.loanAmount)}</Text>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: '4px' }}>
                     <Text strong style={{ fontSize: '15px' }}>Angsuran per Bulan:</Text>
                     <Text strong style={{ fontSize: '18px', color: token.colorPrimary }}>
                       {formatRupiah(creditDetails.monthlyInstallment)} / bln

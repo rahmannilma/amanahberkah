@@ -10,6 +10,16 @@ export default function JualKendaraan() {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
 
+  const [isMobile, setIsMobile] = React.useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleFinish = (values) => {
     const { nama, wa, type, brand_model, year_km, lokasi, harga, kondisi } = values;
 
@@ -44,18 +54,19 @@ Mohon informasi estimasi harga dan kelayakan untuk unit saya. Terima kasih!`;
   };
 
   return (
-    <div style={{ padding: '40px 24px', maxWidth: '800px', margin: '0 auto', minHeight: '100vh' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <Title level={2} style={{ margin: 0, fontWeight: 800, color: token.colorPrimary }}>
+    <div style={{ padding: isMobile ? '24px 12px' : '40px 24px', maxWidth: '800px', margin: '0 auto', minHeight: '100vh' }}>
+      <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '40px' }}>
+        <Title level={isMobile ? 3 : 2} style={{ margin: 0, fontWeight: 800, color: token.colorPrimary }}>
           Jual Kendaraan Anda
         </Title>
-        <Paragraph style={{ color: token.colorTextSecondary, marginTop: '8px', fontSize: '15px' }}>
+        <Paragraph style={{ color: token.colorTextSecondary, marginTop: '8px', fontSize: isMobile ? '13px' : '15px' }}>
           Isi detail kendaraan Anda di bawah ini. Tim AMANAH BERKAH akan meninjau dan menghubungi Anda kembali via WhatsApp.
         </Paragraph>
       </div>
 
       <Card
         bordered={false}
+        styles={{ body: { padding: isMobile ? '16px' : '24px' } }}
         style={{
           background: token.colorBgContainer,
           borderRadius: '16px',
@@ -169,7 +180,8 @@ Mohon informasi estimasi harga dan kelayakan untuk unit saya. Terima kasih!`;
                 fontWeight: 'bold',
                 background: `linear-gradient(135deg, ${token.colorPrimary}, #f97316)`,
                 border: 'none',
-                boxShadow: '0 4px 15px rgba(220, 38, 38, 0.4)'
+                boxShadow: '0 4px 15px rgba(220, 38, 38, 0.4)',
+                width: isMobile ? '100%' : 'auto'
               }}
             >
               Kirim ke WhatsApp Sales

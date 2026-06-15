@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Card, Row, Col, Typography, Space, Tag, theme } from 'antd';
 import { DUMMY_VEHICLES } from './KatalogKendaraan';
 
@@ -6,6 +6,16 @@ const { Title, Paragraph, Text } = Typography;
 
 export default function Beranda({ onNavigate, vehicles }) {
   const { token } = theme.useToken();
+
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Filter 3 mobil pertama yang bertipe Mobil dan berstatus Tersedia
   const featuredCars = useMemo(() => {
@@ -27,11 +37,11 @@ export default function Beranda({ onNavigate, vehicles }) {
       {/* 1. HERO SECTION */}
       <section style={{
         position: 'relative',
-        minHeight: 'calc(100vh - 72px)',
+        minHeight: isMobile ? 'auto' : 'calc(100vh - 72px)',
         display: 'flex',
         alignItems: 'center',
-        paddingTop: '40px',
-        paddingBottom: '40px',
+        paddingTop: isMobile ? '60px' : '40px',
+        paddingBottom: isMobile ? '60px' : '40px',
         overflow: 'hidden'
       }}>
         {/* Background Overlay & Image */}
@@ -61,7 +71,7 @@ export default function Beranda({ onNavigate, vehicles }) {
               backdropFilter: 'blur(10px)',
               padding: '8px 16px',
               borderRadius: '9999px',
-              marginBottom: '32px',
+              marginBottom: isMobile ? '20px' : '32px',
               border: '1px solid rgba(255, 255, 255, 0.05)'
             }}>
               <span className="pulse-dot"></span>
@@ -72,7 +82,7 @@ export default function Beranda({ onNavigate, vehicles }) {
 
             {/* Title */}
             <h1 className="font-montserrat" style={{
-              fontSize: '44px',
+              fontSize: isMobile ? '28px' : '44px',
               fontWeight: 800,
               color: '#ffffff',
               marginBottom: '24px',
@@ -86,16 +96,16 @@ export default function Beranda({ onNavigate, vehicles }) {
             {/* Paragraph */}
             <Paragraph className="font-inter" style={{
               color: '#e5beb4',
-              fontSize: '18px',
+              fontSize: isMobile ? '14px' : '18px',
               lineHeight: '1.6',
               maxWidth: '600px',
-              marginBottom: '40px'
+              marginBottom: isMobile ? '28px' : '40px'
             }}>
               AMANAH BERKAH menghadirkan unit kendaraan bekas pilihan dengan kondisi terbaik, dokumen lengkap, dan review yang transparan langsung dari showroom kami di <strong style={{ color: '#ffffff' }}>Mamuju</strong>.
             </Paragraph>
 
             {/* Actions */}
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', flexDirection: isMobile ? 'column' : 'row' }}>
               <button
                 onClick={() => onNavigate('mobil')}
                 className="primary-btn-gradient font-montserrat"
@@ -108,7 +118,9 @@ export default function Beranda({ onNavigate, vehicles }) {
                   border: 'none',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  justifyContent: isMobile ? 'center' : 'flex-start',
+                  width: isMobile ? '100%' : 'auto'
                 }}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>directions_car</span>
@@ -127,7 +139,9 @@ export default function Beranda({ onNavigate, vehicles }) {
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  justifyContent: isMobile ? 'center' : 'flex-start',
+                  width: isMobile ? '100%' : 'auto'
                 }}
               >
                 <span className="material-symbols-outlined">sell</span>
@@ -138,45 +152,48 @@ export default function Beranda({ onNavigate, vehicles }) {
         </div>
 
         {/* Decorative MAMUJU Background Text */}
-        <div style={{
-          position: 'absolute',
-          bottom: '40px',
-          right: '48px',
-          opacity: 0.15,
-          userSelect: 'none',
-          pointerEvents: 'none'
-        }} className="font-montserrat">
-          <div style={{ fontSize: '120px', fontWeight: 900, color: '#ac8980', letterSpacing: '4px' }}>MAMUJU</div>
-        </div>
+        {!isMobile && (
+          <div style={{
+            position: 'absolute',
+            bottom: '40px',
+            right: '48px',
+            opacity: 0.15,
+            userSelect: 'none',
+            pointerEvents: 'none'
+          }} className="font-montserrat">
+            <div style={{ fontSize: '120px', fontWeight: 900, color: '#ac8980', letterSpacing: '4px' }}>MAMUJU</div>
+          </div>
+        )}
       </section>
 
+
       {/* 2. TENTANG KAMI & BENTO GRID SECTION */}
-      <section style={{ padding: '80px 0', borderTop: '1px solid rgba(172, 137, 128, 0.1)' }}>
+      <section style={{ padding: isMobile ? '40px 0' : '80px 0', borderTop: '1px solid rgba(172, 137, 128, 0.1)' }}>
         <div className="premium-container">
-          <Row gutter={[32, 32]}>
+          <Row gutter={isMobile ? [24, 24] : [32, 32]}>
             {/* Left Column - Info & Statistics */}
             <Col xs={24} lg={8}>
-              <div style={{ position: 'sticky', top: '100px' }}>
+              <div style={{ position: isMobile ? 'static' : 'sticky', top: '100px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ff562d', marginBottom: '16px' }}>
                   <span className="material-symbols-outlined">info</span>
                   <span className="font-montserrat" style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '2px' }}>Tentang Kami</span>
                 </div>
-                <h2 className="font-montserrat" style={{ fontSize: '32px', fontWeight: 700, color: '#ffffff', marginBottom: '24px', lineHeight: '1.3' }}>
+                <h2 className="font-montserrat" style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: 700, color: '#ffffff', marginBottom: '24px', lineHeight: '1.3' }}>
                   Transparansi Adalah <span style={{ color: '#ff562d' }}>Prioritas Kami.</span>
                 </h2>
-                <p className="font-inter" style={{ color: '#ac8980', fontSize: '16px', lineHeight: '1.6', marginBottom: '32px' }}>
+                <p className="font-inter" style={{ color: '#ac8980', fontSize: isMobile ? '14px' : '16px', lineHeight: '1.6', marginBottom: '32px' }}>
                   Kami bukan sekadar perantara, kami adalah partner Anda dalam menemukan kendaraan impian. Beroperasi di Mamuju, Amanah Berkah membangun kepercayaan melalui seleksi unit yang ketat.
                 </p>
                 <Row gutter={[16, 16]}>
                   <Col span={12}>
-                    <div style={{ padding: '24px', borderRadius: '16px', background: '#1b1b1d', border: '1px solid rgba(172, 137, 128, 0.1)' }}>
-                      <div className="font-montserrat" style={{ fontSize: '28px', fontWeight: 800, color: '#ff562d', marginBottom: '4px' }}>500+</div>
+                    <div style={{ padding: isMobile ? '16px' : '24px', borderRadius: '16px', background: '#1b1b1d', border: '1px solid rgba(172, 137, 128, 0.1)' }}>
+                      <div className="font-montserrat" style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: 800, color: '#ff562d', marginBottom: '4px' }}>500+</div>
                       <div className="font-inter" style={{ fontSize: '13px', color: '#ac8980', fontWeight: 600 }}>Unit Terjual</div>
                     </div>
                   </Col>
                   <Col span={12}>
-                    <div style={{ padding: '24px', borderRadius: '16px', background: '#1b1b1d', border: '1px solid rgba(172, 137, 128, 0.1)' }}>
-                      <div className="font-montserrat" style={{ fontSize: '28px', fontWeight: 800, color: '#ff562d', marginBottom: '4px' }}>4.9/5</div>
+                    <div style={{ padding: isMobile ? '16px' : '24px', borderRadius: '16px', background: '#1b1b1d', border: '1px solid rgba(172, 137, 128, 0.1)' }}>
+                      <div className="font-montserrat" style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: 800, color: '#ff562d', marginBottom: '4px' }}>4.9/5</div>
                       <div className="font-inter" style={{ fontSize: '13px', color: '#ac8980', fontWeight: 600 }}>Rating Konsumen</div>
                     </div>
                   </Col>
@@ -189,7 +206,7 @@ export default function Beranda({ onNavigate, vehicles }) {
               <Row gutter={[24, 24]}>
                 {/* Bento Card 1 */}
                 <Col xs={24} md={12}>
-                  <div className="bento-card" style={{ padding: '32px', height: '100%' }}>
+                  <div className="bento-card" style={{ padding: isMobile ? '20px' : '32px', height: '100%' }}>
                     <div style={{
                       width: '48px',
                       height: '48px',
@@ -212,7 +229,7 @@ export default function Beranda({ onNavigate, vehicles }) {
 
                 {/* Bento Card 2 */}
                 <Col xs={24} md={12}>
-                  <div className="bento-card" style={{ padding: '32px', height: '100%' }}>
+                  <div className="bento-card" style={{ padding: isMobile ? '20px' : '32px', height: '100%' }}>
                     <div style={{
                       width: '48px',
                       height: '48px',
@@ -235,8 +252,8 @@ export default function Beranda({ onNavigate, vehicles }) {
 
                 {/* Bento Card 3 (Full width bento) */}
                 <Col xs={24}>
-                  <div className="bento-card" style={{ padding: '32px' }}>
-                    <Row gutter={[24, 24]} align="middle">
+                  <div className="bento-card" style={{ padding: isMobile ? '20px' : '32px' }}>
+                    <Row gutter={isMobile ? [16, 16] : [24, 24]} align="middle">
                       <Col xs={24} md={12}>
                         <div style={{
                           width: '48px',
@@ -258,7 +275,7 @@ export default function Beranda({ onNavigate, vehicles }) {
                       </Col>
                       <Col xs={24} md={12}>
                         <div style={{
-                          height: '200px',
+                          height: isMobile ? '150px' : '200px',
                           borderRadius: '12px',
                           overflow: 'hidden',
                           position: 'relative',
@@ -291,12 +308,20 @@ export default function Beranda({ onNavigate, vehicles }) {
       </section>
 
       {/* 3. MOBIL PILIHAN TERBARU (DYNAMIC) */}
-      <section style={{ padding: '80px 0', borderTop: '1px solid rgba(172, 137, 128, 0.1)' }}>
+      <section style={{ padding: isMobile ? '40px 0' : '80px 0', borderTop: '1px solid rgba(172, 137, 128, 0.1)' }}>
         <div className="premium-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: isMobile ? 'flex-start' : 'flex-end', 
+            marginBottom: '40px', 
+            flexWrap: 'wrap', 
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: '16px' 
+          }}>
             <div>
               <span className="font-montserrat" style={{ color: '#ff562d', fontWeight: 'bold', letterSpacing: '2px', textTransform: 'uppercase', display: 'block', marginBottom: '8px', fontSize: '12px' }}>STOK TERBARU</span>
-              <h2 className="font-montserrat" style={{ margin: 0, fontWeight: 800, color: '#ffffff', fontSize: '30px' }}>Mobil Pilihan Terbaik</h2>
+              <h2 className="font-montserrat" style={{ margin: 0, fontWeight: 800, color: '#ffffff', fontSize: isMobile ? '24px' : '30px' }}>Mobil Pilihan Terbaik</h2>
             </div>
             <button
               onClick={() => onNavigate('mobil')}
@@ -307,7 +332,9 @@ export default function Beranda({ onNavigate, vehicles }) {
                 padding: '12px 24px',
                 fontSize: '13px',
                 cursor: 'pointer',
-                border: 'none'
+                border: 'none',
+                width: isMobile ? '100%' : 'auto',
+                textAlign: 'center'
               }}
             >
               Katalog Lengkap
@@ -318,7 +345,7 @@ export default function Beranda({ onNavigate, vehicles }) {
             {featuredCars.map((vehicle) => (
               <Col xs={24} sm={12} md={8} key={vehicle.id}>
                 <div className="bento-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ height: '220px', overflow: 'hidden', position: 'relative' }}>
+                  <div style={{ height: isMobile ? '180px' : '220px', overflow: 'hidden', position: 'relative' }}>
                     <img
                       alt={vehicle.name}
                       src={vehicle.images[0]}
@@ -373,7 +400,8 @@ export default function Beranda({ onNavigate, vehicles }) {
                 fontWeight: 'bold',
                 fontSize: '14px',
                 cursor: 'pointer',
-                background: 'transparent'
+                background: 'transparent',
+                width: isMobile ? '100%' : 'auto'
               }}
             >
               Lihat Semua Mobil Bekas ({(vehicles || DUMMY_VEHICLES).filter(v => v.type === 'Mobil' && v.status === 'Tersedia').length} Unit)

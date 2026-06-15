@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Layout, Menu, ConfigProvider, theme } from 'antd';
-import { CarOutlined, FormOutlined, InfoCircleOutlined, HomeOutlined } from '@ant-design/icons';
+import { Layout, Menu, ConfigProvider, theme, Drawer } from 'antd';
+import { CarOutlined, FormOutlined, InfoCircleOutlined, HomeOutlined, MenuOutlined } from '@ant-design/icons';
 import KatalogKendaraan from './components/KatalogKendaraan';
 import JualKendaraan from './components/JualKendaraan';
 import TentangKontak from './components/TentangKontak';
@@ -15,10 +15,23 @@ const { Header, Content, Footer } = Layout;
 export default function App() {
   const [currentKey, setCurrentKey] = useState('beranda');
 
+  // Screen width monitoring
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Admin Login State (synchronized with localStorage)
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
     return localStorage.getItem('isAdminLoggedIn') === 'true';
   });
+
 
   // Dynamic Vehicles State (synchronized with Supabase)
   const [vehicles, setVehicles] = useState([]);
@@ -57,9 +70,18 @@ export default function App() {
   // Seed Database with Initial Mock Data
   const seedDatabase = async () => {
     try {
+      const formattedVehicles = INITIAL_VEHICLES.map((v) => {
+        const copy = { ...v };
+        if (copy.hasOwnProperty('soldDate')) {
+          copy.solddate = copy.soldDate;
+          delete copy.soldDate;
+        }
+        return copy;
+      });
+
       const { data, error } = await supabase
         .from('vehicles')
-        .insert(INITIAL_VEHICLES)
+        .insert(formattedVehicles)
         .select();
 
       if (error) {
@@ -109,7 +131,7 @@ export default function App() {
 
     const { error } = await supabase
       .from('vehicles')
-      .update({ status: nextStatus, soldDate: nextSoldDate })
+      .update({ status: nextStatus, solddate: nextSoldDate })
       .eq('id', id);
 
     if (error) {
@@ -117,7 +139,7 @@ export default function App() {
       throw error;
     } else {
       setVehicles((prev) =>
-        prev.map((v) => (v.id === id ? { ...v, status: nextStatus, soldDate: nextSoldDate } : v))
+        prev.map((v) => (v.id === id ? { ...v, status: nextStatus, solddate: nextSoldDate } : v))
       );
     }
   };
@@ -232,73 +254,190 @@ export default function App() {
           alignItems: 'center', 
           justifyContent: 'space-between',
           height: '72px',
-          padding: '0 48px',
+          padding: isMobile ? '0 16px' : '0 48px',
           lineHeight: '72px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#ff562d', marginRight: '8px', fontVariationSettings: "'FILL' 1" }}>
               directions_car
             </span>
-            <span className="font-montserrat" style={{ fontSize: '20px', fontWeight: 800, color: '#e5e1e4', letterSpacing: '-1px' }}>
+            <span className="font-montserrat" style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 800, color: '#e5e1e4', letterSpacing: '-1px' }}>
               AMANAH BERKAH
             </span>
           </div>
-          <Menu
-            mode="horizontal"
-            selectedKeys={[currentKey]}
-            onClick={(e) => setCurrentKey(e.key)}
-            items={menuItems}
-            style={{ 
-              flex: 1, 
-              borderBottom: 'none', 
-              background: 'transparent',
-              justifyContent: 'center',
-              lineHeight: '72px',
-              fontSize: '15px'
-            }}
-          />
-          {isAdminLoggedIn ? (
-            <button 
-              onClick={handleLogout}
-              className="secondary-btn-outline font-montserrat"
+
+          {!isMobile && (
+            <Menu
+              mode="horizontal"
+              selectedKeys={[currentKey]}
+              onClick={(e) => setCurrentKey(e.key)}
+              items={menuItems}
               style={{ 
-                padding: '10px 24px', 
-                borderRadius: '8px', 
-                fontFamily: 'Inter', 
-                fontSize: '14px', 
-                fontWeight: 600, 
-                cursor: 'pointer',
-                border: '1px solid #ff562d',
-                lineHeight: '1.2',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                flex: 1, 
+                borderBottom: 'none', 
+                background: 'transparent',
+                justifyContent: 'center',
+                lineHeight: '72px',
+                fontSize: '15px'
               }}
-            >
-              Keluar
-            </button>
-          ) : (
-            <button 
-              onClick={() => setCurrentKey('login')}
-              className="primary-btn-gradient font-montserrat"
-              style={{ 
-                padding: '10px 24px', 
-                borderRadius: '8px', 
-                fontFamily: 'Inter', 
-                fontSize: '14px', 
-                fontWeight: 600, 
-                cursor: 'pointer',
+            />
+          )}
+
+          {!isMobile && (
+            isAdminLoggedIn ? (
+              <button 
+                onClick={handleLogout}
+                className="secondary-btn-outline font-montserrat"
+                style={{ 
+                  padding: '10px 24px', 
+                  borderRadius: '8px', 
+                  fontFamily: 'Inter', 
+                  fontSize: '14px', 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  border: '1px solid #ff562d',
+                  lineHeight: '1.2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                Keluar
+              </button>
+            ) : (
+              <button 
+                onClick={() => setCurrentKey('login')}
+                className="primary-btn-gradient font-montserrat"
+                style={{ 
+                  padding: '10px 24px', 
+                  borderRadius: '8px', 
+                  fontFamily: 'Inter', 
+                  fontSize: '14px', 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  border: 'none',
+                  lineHeight: '1.2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                Masuk
+              </button>
+            )
+          )}
+
+          {isMobile && (
+            <button
+              onClick={() => setDrawerVisible(true)}
+              style={{
+                background: 'transparent',
                 border: 'none',
-                lineHeight: '1.2',
+                color: '#ffffff',
+                fontSize: '24px',
+                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                padding: '8px'
               }}
             >
-              Masuk
+              <MenuOutlined style={{ color: '#ff562d' }} />
             </button>
           )}
         </Header>
+
+        <Drawer
+          title={
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '28px', color: '#ff562d', marginRight: '8px', fontVariationSettings: "'FILL' 1" }}>
+                directions_car
+              </span>
+              <span className="font-montserrat" style={{ fontSize: '18px', fontWeight: 800, color: '#e5e1e4', letterSpacing: '-1px' }}>
+                AMANAH BERKAH
+              </span>
+            </div>
+          }
+          placement="right"
+          onClose={() => setDrawerVisible(false)}
+          open={drawerVisible}
+          styles={{
+            body: {
+              background: '#131315',
+              padding: '24px 16px',
+            },
+            header: {
+              background: '#1b1b1d',
+              borderBottom: '1px solid rgba(172, 137, 128, 0.1)',
+            }
+          }}
+          width={280}
+        >
+          <Menu
+            mode="vertical"
+            selectedKeys={[currentKey]}
+            onClick={(e) => {
+              setCurrentKey(e.key);
+              setDrawerVisible(false);
+            }}
+            items={menuItems}
+            style={{
+              borderRight: 'none',
+              background: 'transparent',
+              fontSize: '16px',
+              marginBottom: '32px'
+            }}
+          />
+          <div style={{ padding: '0 16px' }}>
+            {isAdminLoggedIn ? (
+              <button 
+                onClick={() => {
+                  handleLogout();
+                  setDrawerVisible(false);
+                }}
+                className="secondary-btn-outline font-montserrat"
+                style={{ 
+                  width: '100%',
+                  padding: '12px 24px', 
+                  borderRadius: '8px', 
+                  fontFamily: 'Inter', 
+                  fontSize: '15px', 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  border: '1px solid #ff562d',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                Keluar
+              </button>
+            ) : (
+              <button 
+                onClick={() => {
+                  setCurrentKey('login');
+                  setDrawerVisible(false);
+                }}
+                className="primary-btn-gradient font-montserrat"
+                style={{ 
+                  width: '100%',
+                  padding: '12px 24px', 
+                  borderRadius: '8px', 
+                  fontFamily: 'Inter', 
+                  fontSize: '15px', 
+                  fontWeight: 600, 
+                  cursor: 'pointer',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                Masuk
+              </button>
+            )}
+          </div>
+        </Drawer>
         
         {/* Margin top to prevent content being covered by the fixed header */}
         <Content style={{ background: '#131315', marginTop: '72px' }}>
@@ -309,12 +448,12 @@ export default function App() {
           background: '#0e0e10', 
           color: '#e5e1e4', 
           borderTop: '1px solid rgba(172, 137, 128, 0.1)',
-          padding: '60px 48px 40px 48px'
+          padding: isMobile ? '40px 16px' : '60px 48px 40px 48px'
         }}>
           <div className="premium-container" style={{ padding: 0 }}>
             <div style={{ 
               display: 'flex', 
-              flexDirection: 'row', 
+              flexDirection: isMobile ? 'column' : 'row', 
               justifyContent: 'space-between', 
               flexWrap: 'wrap',
               gap: '40px',
