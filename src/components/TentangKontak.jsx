@@ -58,7 +58,7 @@ export default function TentangKontak() {
             }}
           >
             <Paragraph style={{ fontSize: '14px', lineHeight: '1.6', color: token.colorTextSecondary }}>
-              <Text strong style={{ color: token.colorText }}>AMANAH BERKAH</Text> adalah showroom kendaraan bekas terkemuka yang berbasis di Mamuju, Sulawesi Barat. Usaha ini dirintis sejak tahun 2007 oleh <Text strong style={{ color: token.colorText }}>Suryono Hadi Pranoto</Text> yang akrab disapa dengan nama panggilan <Text strong style={{ color: token.colorText }}>Kacung</Text>.
+              <Text strong style={{ color: token.colorText }}>AMANAH BERKAH</Text> adalah showroom kendaraan bekas terkemuka yang berbasis di Mamuju, Sulawesi Barat. Usaha ini dirintis sejak tahun 2023 oleh <Text strong style={{ color: token.colorText }}>Rezky Akbar</Text> yang akrab disapa dengan nama panggilan <Text strong style={{ color: token.colorText }}>Resky</Text>.
             </Paragraph>
             <Paragraph style={{ fontSize: '14px', lineHeight: '1.6', color: token.colorTextSecondary }}>
               Perjalanan AMANAH BERKAH berawal dari skala kecil dengan menjual motor bekas, sebelum perlahan melakukan ekspansi besar-besaran ke dunia jual beli mobil bekas. Meskipun sempat mengalami pasang surut dan tantangan finansial yang berat, komitmen untuk terus berbenah secara manajemen, seleksi kelayakan unit, serta efisiensi stok membawa AMANAH BERKAH bertumbuh menjadi showroom dengan volume penjualan unit yang luar biasa tinggi.

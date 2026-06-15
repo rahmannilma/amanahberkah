@@ -433,7 +433,18 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
       )}
 
       <Modal
-        title={selectedVehicle ? `${selectedVehicle.name} (${selectedVehicle.year})` : ''}
+        title={
+          selectedVehicle ? (
+            <Space align="center" style={{ gap: '8px' }}>
+              <span className="material-symbols-outlined" style={{ color: token.colorPrimary, fontVariationSettings: "'FILL' 1", fontSize: '24px' }}>
+                directions_car
+              </span>
+              <span className="font-montserrat" style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 700, color: '#ffffff' }}>
+                {selectedVehicle.name} <span style={{ fontWeight: 400, color: '#ac8980', fontSize: isMobile ? '14px' : '16px' }}>({selectedVehicle.year})</span>
+              </span>
+            </Space>
+          ) : ''
+        }
         open={isModalOpen}
         onCancel={handleCloseModal}
         footer={null}
@@ -443,15 +454,15 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
         {selectedVehicle && (
           <Row gutter={[24, 24]} style={{ marginTop: '16px' }}>
             <Col xs={24} md={12}>
-              <Carousel autoplay style={{ marginBottom: '20px', borderRadius: '8px', overflow: 'hidden' }}>
+              <Carousel autoplay style={{ marginBottom: '20px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)' }}>
                 {selectedVehicle.images.map((img, idx) => (
                   <div key={idx} style={{ height: isMobile ? '180px' : '240px' }}>
                     <img src={img} alt={`img-${idx}`} style={{ width: '100%', height: isMobile ? '180px' : '240px', objectFit: 'cover' }} />
                   </div>
                 ))}
               </Carousel>
-
-              <Descriptions title="Spesifikasi Teknis" bordered column={1} size="small">
+ 
+              <Descriptions title={<span style={{ color: '#ffffff', fontSize: '15px', fontWeight: 700 }} className="font-montserrat">Spesifikasi Teknis</span>} bordered column={1} size="small">
                 <Descriptions.Item label="Mesin">{selectedVehicle.specs.engine}</Descriptions.Item>
                 <Descriptions.Item label="Tenaga">{selectedVehicle.specs.power}</Descriptions.Item>
                 <Descriptions.Item label="Transmisi">{selectedVehicle.specs.transmission}</Descriptions.Item>
@@ -459,12 +470,22 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
                 <Descriptions.Item label="Kapasitas">{selectedVehicle.specs.seats}</Descriptions.Item>
               </Descriptions>
             </Col>
-
+ 
             <Col xs={24} md={12}>
               <Card
-                title={<span style={{ color: token.colorPrimary }}><DollarOutlined /> Simulasi Kredit Flat (Bunga 6%)</span>}
+                title={
+                  <span style={{ color: '#ffffff', fontSize: '15px', fontWeight: 700 }} className="font-montserrat">
+                    <DollarOutlined style={{ color: token.colorPrimary, marginRight: '6px' }} /> Simulasi Kredit Flat (Bunga 6%)
+                  </span>
+                }
                 bordered={false}
-                style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', height: '100%' }}
+                style={{ 
+                  background: 'rgba(255, 255, 255, 0.02)', 
+                  border: '1px solid rgba(255, 86, 45, 0.15)', 
+                  borderRadius: '12px', 
+                  height: '100%',
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+                }}
               >
                 <div style={{ marginBottom: '20px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -480,7 +501,7 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
                     tooltip={{ formatter: (val) => `${val}%` }}
                   />
                 </div>
-
+ 
                 <div style={{ marginBottom: '24px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                     <Text>Tenor (Jangka Waktu): <strong>{tenor} Bulan</strong></Text>
@@ -502,8 +523,8 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
                     }}
                   />
                 </div>
-
-                <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '16px', borderRadius: '8px', marginBottom: '24px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+ 
+                <div style={{ background: 'rgba(255, 86, 45, 0.05)', padding: '16px', borderRadius: '12px', marginBottom: '24px', border: '1px solid rgba(255, 86, 45, 0.2)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                     <Text type="secondary">Pokok Hutang:</Text>
                     <Text>{formatRupiah(creditDetails.loanAmount)}</Text>
@@ -511,11 +532,11 @@ export default function KatalogKendaraan({ type = 'Mobil', vehicles }) {
                   <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: '4px' }}>
                     <Text strong style={{ fontSize: '15px' }}>Angsuran per Bulan:</Text>
                     <Text strong style={{ fontSize: '18px', color: token.colorPrimary }}>
-                      {formatRupiah(creditDetails.monthlyInstallment)} / bln
+                      {formatRupiah(creditDetails.monthlyInstallment)} <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#ac8980' }}>/ bln</span>
                     </Text>
                   </div>
                 </div>
-
+ 
                 <ConfigProvider
                   theme={{
                     token: {
@@ -541,7 +562,7 @@ Mohon info selanjutnya, terima kasih!`;
                       const waUrl = `https://wa.me/6282393700500?text=${encodeURIComponent(messageText)}`;
                       window.open(waUrl, '_blank');
                     }}
-                    style={{ fontWeight: 'bold' }}
+                    style={{ fontWeight: 'bold', borderRadius: '8px', height: '44px' }}
                   >
                     Hubungi Sales via WhatsApp
                   </Button>

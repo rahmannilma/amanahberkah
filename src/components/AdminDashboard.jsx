@@ -1,6 +1,40 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Row, Col, Typography, Input, Select, Button, Modal, Tag, Table, Form, InputNumber, Space, message, theme } from 'antd';
-import { PlusOutlined, SearchOutlined, PoweroffOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Typography, Input, Select, Button, Modal, Tag, Table, Form, InputNumber, Space, message, theme, Upload } from 'antd';
+import { PlusOutlined, SearchOutlined, PoweroffOutlined, UploadOutlined } from '@ant-design/icons';
+
+// Utility helper to convert file to high-performance compressed Base64 string
+const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const scaleSize = MAX_WIDTH / img.width;
+        
+        if (img.width > MAX_WIDTH) {
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+        } else {
+          canvas.width = img.width;
+          canvas.height = img.height;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Quality 0.7 jpeg to minimize base64 payload size
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        resolve(dataUrl);
+      };
+      img.onerror = (error) => reject(error);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+};
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -120,6 +154,19 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
   // 4. ADD NEW VEHICLE (ASYNC WITH SUPABASE)
   const handleAddVehicleSubmit = async (values) => {
     setSubmitting(true);
+    let imageUri = '/image/car_civic.png';
+
+    const fileList = values.imageFile;
+    if (fileList && fileList.length > 0) {
+      const fileObj = fileList[0].originFileObj;
+      try {
+        imageUri = await fileToBase64(fileObj);
+      } catch (err) {
+        console.error('Error converting file to Base64:', err);
+        message.warning('Gagal memproses file gambar. Menggunakan gambar default.');
+      }
+    }
+
     const newVehicle = {
       name: values.name,
       brand: values.brand,
@@ -129,9 +176,7 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
       year: values.year,
       status: 'Tersedia',
       solddate: null,
-      images: [
-        values.imageUrl || '/image/car_civic.png'
-      ],
+      images: [imageUri],
       specs: {
         engine: values.engine || 'N/A',
         power: values.power || 'N/A',
@@ -516,13 +561,21 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
 
       {/* 4. ADD VEHICLE MODAL */}
       <Modal
-        title={<span className="font-montserrat" style={{ color: '#ff562d', fontWeight: 'bold' }}>Tambah Unit Kendaraan Baru</span>}
+        title={
+          <Space align="center" style={{ gap: '8px' }}>
+            <span className="material-symbols-outlined" style={{ color: '#ff562d', fontVariationSettings: "'FILL' 1", fontSize: '24px' }}>
+              add_box
+            </span>
+            <span className="font-montserrat" style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 700, color: '#ffffff' }}>
+              Tambah Unit Kendaraan Baru
+            </span>
+          </Space>
+        }
         open={isAddModalOpen}
         onCancel={() => { setIsAddModalOpen(false); form.resetFields(); }}
         footer={null}
         width={isMobile ? '95%' : 650}
         style={{ top: isMobile ? 10 : 50 }}
-        styles={{ body: { background: '#1b1b1d', color: '#e5e1e4' } }}
       >
         <Form
           form={form}
@@ -599,10 +652,28 @@ export default function AdminDashboard({ vehicles, loading, onAddVehicle, onTogg
           </Row>
 
           <Form.Item
-            name="imageUrl"
-            label={<span style={{ color: '#e5e1e4' }}>URL Gambar Unit (Opsional)</span>}
+            name="imageFile"
+            label={<span style={{ color: '#e5e1e4' }}>Gambar Unit (Wajib)</span>}
+            valuePropName="fileList"
+            getValueFromEvent={(e) => {
+              if (Array.isArray(e)) {
+                return e;
+              }
+              return e && e.fileList;
+            }}
+            rules={[{ required: true, message: 'Silakan upload gambar unit!' }]}
           >
-            <Input placeholder="Masukkan URL gambar. Contoh: /image/car_civic.png" style={{ borderRadius: '8px' }} />
+            <Upload
+              name="image"
+              listType="picture"
+              maxCount={1}
+              beforeUpload={() => false}
+              accept="image/*"
+            >
+              <Button icon={<UploadOutlined />} style={{ width: '100%', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'rgba(0, 0, 0, 0.25)', border: '1px solid rgba(172, 137, 128, 0.2)', color: '#ffffff' }}>
+                Pilih File Gambar
+              </Button>
+            </Upload>
           </Form.Item>
 
           <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '16px', marginBottom: '16px' }}>

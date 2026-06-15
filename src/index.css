@@ -137,3 +137,105 @@ body {
   }
 }
 
+/* ==========================================================================
+   PREMIUM MODAL & DIALOG SYSTEM OVERRIDES
+   ========================================================================== */
+
+/* Modal Content Container - Sleek Dark Gradient with Brand Accent Glow */
+.ant-modal-content {
+  background: linear-gradient(145deg, #1d1d20 0%, #141416 100%) !important;
+  border: 1px solid rgba(255, 86, 45, 0.25) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 30px rgba(255, 86, 45, 0.05) !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+}
+
+@media (max-width: 768px) {
+  .ant-modal-content {
+    padding: 16px !important;
+  }
+}
+
+/* Modal Header - Custom border bottom and spacing */
+.ant-modal-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 86, 45, 0.15) !important;
+  padding-bottom: 16px !important;
+  margin-bottom: 20px !important;
+}
+
+/* Close Button styling */
+.ant-modal-close {
+  color: #ac8980 !important;
+  transition: all 0.2s ease !important;
+}
+.ant-modal-close:hover {
+  color: #ff562d !important;
+  background-color: rgba(255, 86, 45, 0.1) !important;
+}
+
+/* Glassmorphism Backdrop Mask */
+.ant-modal-mask {
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  background: rgba(10, 10, 12, 0.75) !important;
+}
+
+/* Confirm Dialog Specific Stylings (e.g., delete confirmation) */
+.ant-modal-confirm-body .ant-modal-confirm-title {
+  color: #ffffff !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: 700 !important;
+}
+.ant-modal-confirm-body .ant-modal-confirm-content {
+  color: #ac8980 !important;
+  font-size: 14px !important;
+  margin-top: 8px !important;
+}
+
+/* Custom Table/Descriptions Inside Modal */
+.ant-descriptions {
+  background: rgba(255, 255, 255, 0.01) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+.ant-descriptions-bordered .ant-descriptions-view {
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  border-radius: 12px !important;
+}
+.ant-descriptions-bordered .ant-descriptions-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+.ant-descriptions-bordered .ant-descriptions-item-label {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  color: #ac8980 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+  font-weight: 600 !important;
+  padding: 12px 16px !important;
+}
+.ant-descriptions-bordered .ant-descriptions-item-content {
+  color: #e5e1e4 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+  padding: 12px 16px !important;
+}
+
+/* Custom styling for inputs and selects inside Modal */
+.ant-modal-content .ant-form-item-label > label {
+  color: #e5e1e4 !important;
+  font-weight: 500 !important;
+}
+.ant-modal-content .ant-input,
+.ant-modal-content .ant-input-number,
+.ant-modal-content .ant-select-selector {
+  background-color: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(172, 137, 128, 0.2) !important;
+  color: #ffffff !important;
+}
+.ant-modal-content .ant-input:focus,
+.ant-modal-content .ant-input-number-focused,
+.ant-modal-content .ant-select-focused .ant-select-selector {
+  border-color: #ff562d !important;
+  box-shadow: 0 0 0 2px rgba(255, 86, 45, 0.2) !important;
+}
+
+
