@@ -119,7 +119,7 @@ export default function TentangKontak() {
                   <div>
                     <Text strong style={{ display: 'block' }}>Alamat Showroom Utama</Text>
                     <Text type="secondary" style={{ fontSize: '13px' }}>
-                      Jl. Andi Makkasau, Karema, Kec. Mamuju, Kabupaten Mamuju, Sulawesi Barat 91511
+                      Mutiara Gading Residence, Karema, Kec. Mamuju, Kabupaten Mamuju, Sulawesi Barat 91512
                     </Text>
                   </div>
                 </div>
