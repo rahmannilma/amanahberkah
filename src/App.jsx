@@ -13,7 +13,13 @@ import { supabase } from './supabaseClient';
 const { Header, Content, Footer } = Layout;
 
 export default function App() {
-  const [currentKey, setCurrentKey] = useState('beranda');
+  const [currentKey, setCurrentKey] = useState(() => {
+    return localStorage.getItem('currentKey') || 'beranda';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('currentKey', currentKey);
+  }, [currentKey]);
 
   // Screen width monitoring
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
@@ -245,20 +251,23 @@ export default function App() {
       }}
     >
       <Layout style={{ minHeight: '100vh', background: '#131315' }}>
-        <Header className="glass-nav" style={{ 
-          position: 'fixed',
-          top: 0,
-          zIndex: 1000,
-          width: '100%',
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          height: '72px',
-          padding: isMobile ? '0 16px' : '0 48px',
-          lineHeight: '72px'
-        }}>
+        <Header 
+          className={isMobile ? "mobile-top-header" : "glass-nav"} 
+          style={isMobile ? { lineHeight: '60px' } : { 
+            position: 'fixed',
+            top: 0,
+            zIndex: 1000,
+            width: '100%',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            height: '72px',
+            padding: '0 48px',
+            lineHeight: '72px'
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#ff562d', marginRight: '8px', fontVariationSettings: "'FILL' 1" }}>
+            <span className="material-symbols-outlined" style={{ fontSize: isMobile ? '26px' : '32px', color: '#ff562d', marginRight: isMobile ? '6px' : '8px', fontVariationSettings: "'FILL' 1" }}>
               directions_car
             </span>
             <span className="font-montserrat" style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 800, color: '#e5e1e4', letterSpacing: '-1px' }}>
@@ -328,22 +337,33 @@ export default function App() {
           )}
 
           {isMobile && (
-            <button
-              onClick={() => setDrawerVisible(true)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#ffffff',
-                fontSize: '24px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '8px'
-              }}
-            >
-              <MenuOutlined style={{ color: '#ff562d' }} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <button 
+                className="mobile-header-icon-btn" 
+                onClick={() => setCurrentKey('mobil')}
+                title="Cari Mobil"
+              >
+                <span className="material-symbols-outlined">search</span>
+              </button>
+              
+              <a 
+                className="mobile-header-icon-btn" 
+                href="https://wa.me/6282393700500" 
+                target="_blank" 
+                rel="noreferrer"
+                title="Chat WhatsApp"
+              >
+                <span className="material-symbols-outlined wa-green">chat</span>
+              </a>
+
+              <button
+                className="mobile-header-icon-btn"
+                onClick={() => setDrawerVisible(true)}
+                title="Opsi Lainnya"
+              >
+                <span className="material-symbols-outlined">more_vert</span>
+              </button>
+            </div>
           )}
         </Header>
 
@@ -439,8 +459,12 @@ export default function App() {
           </div>
         </Drawer>
         
-        {/* Margin top to prevent content being covered by the fixed header */}
-        <Content style={{ background: '#131315', marginTop: '72px' }}>
+        {/* Margin top to prevent content being covered by the fixed header & padding bottom for mobile nav */}
+        <Content style={{ 
+          background: '#131315', 
+          marginTop: isMobile ? '60px' : '72px',
+          paddingBottom: isMobile ? '80px' : '0' 
+        }}>
           {renderContent()}
         </Content>
 
@@ -506,6 +530,73 @@ export default function App() {
             </div>
           </div>
         </Footer>
+
+        {isMobile && (
+          <div className="mobile-bottom-nav">
+            <button 
+              className={`mobile-nav-item ${currentKey === 'beranda' ? 'active' : ''}`}
+              onClick={() => setCurrentKey('beranda')}
+            >
+              <div className="mobile-nav-icon-container">
+                <span className="material-symbols-outlined">home</span>
+              </div>
+              <span className="mobile-nav-label">Beranda</span>
+            </button>
+
+            <button 
+              className={`mobile-nav-item ${currentKey === 'jual' ? 'active' : ''}`}
+              onClick={() => setCurrentKey('jual')}
+            >
+              <div className="mobile-nav-icon-container">
+                <span className="material-symbols-outlined">sell</span>
+              </div>
+              <span className="mobile-nav-label">Jual</span>
+            </button>
+
+            <button 
+              className={`mobile-nav-fab ${currentKey === 'mobil' ? 'active' : ''}`}
+              onClick={() => setCurrentKey('mobil')}
+            >
+              <div className="mobile-nav-fab-circle">
+                <span className="material-symbols-outlined">directions_car</span>
+              </div>
+              <span className="mobile-nav-fab-label">Katalog</span>
+            </button>
+
+            <button 
+              className={`mobile-nav-item ${currentKey === 'tentang' ? 'active' : ''}`}
+              onClick={() => setCurrentKey('tentang')}
+            >
+              <div className="mobile-nav-icon-container">
+                <span className="material-symbols-outlined">info</span>
+              </div>
+              <span className="mobile-nav-label">Tentang</span>
+            </button>
+
+            {isAdminLoggedIn ? (
+              <button 
+                className={`mobile-nav-item ${currentKey === 'admin' ? 'active' : ''}`}
+                onClick={() => setCurrentKey('admin')}
+              >
+                <div className="mobile-nav-icon-container">
+                  <span className="material-symbols-outlined" style={{ color: '#ff562d' }}>dashboard</span>
+                  <span className="admin-badge-dot"></span>
+                </div>
+                <span className="mobile-nav-label" style={{ color: '#ffb4a2' }}>Admin</span>
+              </button>
+            ) : (
+              <button 
+                className={`mobile-nav-item ${currentKey === 'login' ? 'active' : ''}`}
+                onClick={() => setCurrentKey('login')}
+              >
+                <div className="mobile-nav-icon-container">
+                  <span className="material-symbols-outlined">login</span>
+                </div>
+                <span className="mobile-nav-label">Masuk</span>
+              </button>
+            )}
+          </div>
+        )}
       </Layout>
     </ConfigProvider>
   );
